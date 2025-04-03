@@ -41,7 +41,7 @@ Para ejecutar este proyecto localmente, necesitarás:
 1. Clona este repositorio:
 
     ```bash
-    git clone https://github.com/tuusuario/helgai.git
+    git clone https://github.com/brianrddev/helgai.git
     cd helgai
     ```
 
