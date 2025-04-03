@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/* Define theme variables if needed */
+@theme {
+    --font-recoleta: 'Recoleta';
+    --font-recoleta-md: 'Recoleta-Medium';
+    --font-recoleta-bd: 'Recoleta-Bold';
+    --font-satoshi: 'Satoshi';
+    --font-satoshi-md: 'Satoshi-Medium';
+    --font-satoshi-bd: 'Satoshi-Bold';
+}
+
+/* Correct font-face declarations matching your actual files */
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/public/fonts/Satoshi-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Satoshi-Medium';
+    src: url('/public/fonts/Satoshi-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Satoshi-Bold';
+    src: url('/public/fonts/Satoshi-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Recoleta';
+    src: url('/public/fonts/Recoleta-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Recoleta-Medium';
+    src: url('/public/fonts/Recoleta-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Recoleta-Bold';
+    src: url('/public/fonts/Recoleta-Bold.woff2') format('woff2');
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-satoshi);
+}
