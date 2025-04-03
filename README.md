@@ -1,4 +1,6 @@
-# HelgaI - Tu Entrenador Personal con IA
+# HelgAI - Tu Entrenador Personal con IA
+
+![image](https://github.com/user-attachments/assets/049da979-de48-43c2-ae07-d225d3d6c9be)
 
 ## 🏋️ Descripción
 
@@ -77,7 +79,7 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para má
 
 ## 📧 Contacto
 
-Si tienes preguntas o sugerencias, puedes contactarme en [tu@email.com](mailto:tu@email.com).
+Si tienes preguntas o sugerencias, puedes contactarme en [brianramirezdelgadodev@gmail.com](mailto:brianramirezdelgadodev@gmail.com).
 
 ---
 
