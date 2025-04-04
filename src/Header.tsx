@@ -7,7 +7,7 @@ export default function Header() {
                         id="a"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 2554.016 1710.298"
-                        className="size-10"
+                        className="size-12"
                         fill="none"
                     >
                         <path
