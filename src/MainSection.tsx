@@ -103,11 +103,10 @@ export default function MainSection() {
 
             const data = await response.json();
 
-            // 👇 Aquí extraes el contenido generado
-            const content = data.choices?.[0]?.message?.content;
+            // ✅ Ahora el backend retorna { content: "..." }
+            const content = data.content;
             const json = JSON.parse(content); // el plan generado
 
-            // Luego lo usas como necesites
             console.log(json);
             return json;
         } catch (err) {
