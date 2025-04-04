@@ -16,7 +16,7 @@ export default function SelectedDays({
     return (
         <form onSubmit={handleFinalSubmit} className="mb-6">
             <div>
-                <div className="mb-4 flex flex-wrap gap-2 rounded-md bg-gray-50 mask-b-from-12 p-4">
+                <div className="mb-4 flex flex-wrap gap-2 rounded-md bg-transparent mask-b-from-56 p-4 md:mask-b-from-12">
                     {availableDays.map((day) => (
                         <button
                             key={day}

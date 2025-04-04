@@ -91,28 +91,71 @@ export default function MainSection() {
 
         try {
             const response = await fetch(
-                '/.netlify/functions/generateWorkout',
+                'https://api.openai.com/v1/chat/completions',
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${import.meta.env.VITE_OPEN_AI_KEY}`,
                     },
-                    body: JSON.stringify({ userName, goals, days }),
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content:
+                                    'Eres un entrenador personal experto que crea planes de entrenamiento personalizados. Responde siempre con un objeto JSON válido que tenga el formato exacto que se especifica, sin texto adicional.',
+                            },
+                            {
+                                role: 'user',
+                                content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(', ')}.
+El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
+
+Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
+{
+  "generatedPlan": [
+    {
+      "day": "Nombre del día",
+      "exercises": [
+        {
+          "name": "Nombre del ejercicio",
+          "sets": número de series,
+          "repetitions": "rango de repeticiones (ej: '8-12')",
+          "rest": "tiempo de descanso (ej: '60 seg')"
+        }
+        // más ejercicios
+      ]
+    }
+    // más días
+  ]
+}
+
+Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos. No incluyas nada más que el JSON.`,
+                            },
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000,
+                    }),
                 },
             );
 
+            if (!response.ok) {
+                throw new Error('Error en la respuesta de la API');
+            }
+
             const data = await response.json();
-
-            // 👇 Aquí extraes el contenido generado
             const content = data.choices?.[0]?.message?.content;
-            const json = JSON.parse(content); // el plan generado
 
-            // Luego lo usas como necesites
-            console.log(json);
+            if (!content) {
+                throw new Error('No se recibió contenido de la API');
+            }
+
+            const json = JSON.parse(content);
             return json;
         } catch (err) {
             console.error(err);
             setApiError('Error al generar el plan de entrenamiento.');
+            throw err; // para que el handleFinalSubmit lo capture también
         }
     };
 
@@ -165,7 +208,7 @@ export default function MainSection() {
                 <div className="p-6">
                     {/* Sequential Input Form */}
                     {!workoutPlan ? (
-                        <div className="mx-auto flex w-full max-w-3xl items-center justify-center">
+                        <div className="mx-auto flex w-full max-w-60 items-center justify-center md:max-w-96">
                             {step === 1 && (
                                 <UserName
                                     handleNameSubmit={handleNameSubmit}
@@ -206,9 +249,9 @@ export default function MainSection() {
                         </div>
                     ) : (
                         // Display workout plan
-                        <div className="mx-auto w-full min-w-3xl rounded-md bg-gray-50 p-8 shadow-2xl shadow-blue-700/80">
+                        <div className="mx-auto rounded-md bg-gray-50 shadow-2xl shadow-blue-700/80 md:w-full md:p-8 lg:min-w-3xl">
                             <div className="mb-6 border-b border-gray-300 p-6 pb-0">
-                                <div className="mb-6 flex items-center justify-between">
+                                <div className="mb-6 flex justify-between">
                                     <div className="flex items-center">
                                         <div className="flex flex-col gap-2">
                                             <h3 className="font-satoshi-bd text-xl capitalize">
@@ -222,7 +265,7 @@ export default function MainSection() {
                                     </div>
                                     <button
                                         onClick={resetForm}
-                                        className="rounded bg-gray-300 px-4 py-2 hover:bg-blue-600"
+                                        className="max-h-10 cursor-pointer rounded bg-gray-300 px-4 py-2 transition-all duration-200 ease-in-out hover:bg-blue-600 hover:text-gray-50"
                                     >
                                         Nuevo plan
                                     </button>
