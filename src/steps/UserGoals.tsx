@@ -14,7 +14,7 @@ export default function UserGoals({
     return (
         <form onSubmit={handleGoalsSubmit} className="mb-8">
             <div className="flex flex-col">
-                <div className="mb-4 flex flex-col gap-2 rounded-md bg-transparent mask-b-from-56 p-4 md:flex-wrap md:mask-b-from-12">
+                <div className="mb-4 flex flex-col gap-2 rounded-md bg-transparent mask-b-from-56 p-4 md:flex-row md:flex-nowrap md:mask-b-from-12">
                     {availableGoals.map((goal) => (
                         <button
                             key={goal}
@@ -30,7 +30,7 @@ export default function UserGoals({
                         </button>
                     ))}
                 </div>
-                <div className="mx-auto mt-4 flex md:justify-end">
+                <div className="mx-auto mt-4 flex md:mx-0 md:justify-end">
                     <button
                         type="submit"
                         disabled={selectedGoals.length === 0}

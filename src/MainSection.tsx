@@ -91,71 +91,28 @@ export default function MainSection() {
 
         try {
             const response = await fetch(
-                'https://api.openai.com/v1/chat/completions',
+                '/.netlify/functions/generateWorkout',
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${import.meta.env.VITE_OPEN_AI_KEY}`,
                     },
-                    body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'system',
-                                content:
-                                    'Eres un entrenador personal experto que crea planes de entrenamiento personalizados. Responde siempre con un objeto JSON válido que tenga el formato exacto que se especifica, sin texto adicional.',
-                            },
-                            {
-                                role: 'user',
-                                content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(', ')}.
-El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
-
-Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
-{
-  "generatedPlan": [
-    {
-      "day": "Nombre del día",
-      "exercises": [
-        {
-          "name": "Nombre del ejercicio",
-          "sets": número de series,
-          "repetitions": "rango de repeticiones (ej: '8-12')",
-          "rest": "tiempo de descanso (ej: '60 seg')"
-        }
-        // más ejercicios
-      ]
-    }
-    // más días
-  ]
-}
-
-Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos. No incluyas nada más que el JSON.`,
-                            },
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 2000,
-                    }),
+                    body: JSON.stringify({ userName, goals, days }),
                 },
             );
 
-            if (!response.ok) {
-                throw new Error('Error en la respuesta de la API');
-            }
-
             const data = await response.json();
+
+            // 👇 Aquí extraes el contenido generado
             const content = data.choices?.[0]?.message?.content;
+            const json = JSON.parse(content); // el plan generado
 
-            if (!content) {
-                throw new Error('No se recibió contenido de la API');
-            }
-
-            const json = JSON.parse(content);
+            // Luego lo usas como necesites
+            console.log(json);
             return json;
         } catch (err) {
             console.error(err);
             setApiError('Error al generar el plan de entrenamiento.');
-            throw err; // para que el handleFinalSubmit lo capture también
         }
     };
 
@@ -208,7 +165,7 @@ Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos
                 <div className="p-6">
                     {/* Sequential Input Form */}
                     {!workoutPlan ? (
-                        <div className="mx-auto flex w-full max-w-60 items-center justify-center md:max-w-96">
+                        <div className="mx-auto flex w-60 items-center justify-center md:w-full">
                             {step === 1 && (
                                 <UserName
                                     handleNameSubmit={handleNameSubmit}
