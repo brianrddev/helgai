@@ -1,4 +1,3 @@
-// netlify/functions/generateWorkout.js
 export async function handler(event) {
     const { userName, goals, days } = JSON.parse(event.body);
 
@@ -10,31 +9,27 @@ export async function handler(event) {
         },
         {
             role: 'user',
-            content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(
-                ', ',
-            )}.
-      El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
+            content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(', ')}.
+El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
 
-      Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
-      {
-        "generatedPlan": [
-          {
-            "day": "Nombre del día",
-            "exercises": [
-              {
-                "name": "Nombre del ejercicio",
-                "sets": número de series,
-                "repetitions": "rango de repeticiones (ej: '8-12')",
-                "rest": "tiempo de descanso (ej: '60 seg')"
-              },
-              ... más ejercicios
-            ]
-          },
-          ... más días
-        ]
-      }
+Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
+{
+  "generatedPlan": [
+    {
+      "day": "Nombre del día",
+      "exercises": [
+        {
+          "name": "Nombre del ejercicio",
+          "sets": número de series,
+          "repetitions": "rango de repeticiones (ej: '8-12')",
+          "rest": "tiempo de descanso (ej: '60 seg')"
+        }
+      ]
+    }
+  ]
+}
 
-      Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos. No incluyas nada más que el JSON.`,
+Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos. No incluyas nada más que el JSON.`,
         },
     ];
 
@@ -57,10 +52,11 @@ export async function handler(event) {
         );
 
         const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
 
         return {
             statusCode: 200,
-            body: JSON.stringify(data),
+            body: JSON.stringify({ content }), // 👈 Solo devolvemos el string generado
         };
     } catch (err) {
         return {
