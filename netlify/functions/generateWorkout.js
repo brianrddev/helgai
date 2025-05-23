@@ -62,10 +62,10 @@ NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown 
                     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
                 },
                 body: JSON.stringify({
-                    model: 'gpt-4-turbo',
+                    model: 'gpt-3.5-turbo', // Modelo actualizado y válido
                     messages,
-                    temperature: 0,
-                    max_tokens: 4096, // Límite máximo de tokens de salida para GPT-4 Turbo
+                    temperature: 0.7,
+                    max_tokens: 4000, // Reducido para el modelo estándar
                 }),
             },
         );
