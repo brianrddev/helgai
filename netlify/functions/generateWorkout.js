@@ -64,8 +64,8 @@ NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown 
                 body: JSON.stringify({
                     model: 'gpt-3.5-turbo', // Modelo actualizado y válido
                     messages,
-                    temperature: 0.7,
-                    max_tokens: 4000, // Reducido para el modelo estándar
+                    temperature: 0,
+                    max_tokens: 8000, // Reducido para el modelo estándar
                 }),
             },
         );
