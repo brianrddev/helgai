@@ -4,16 +4,15 @@ export async function handler(event) {
     const messages = [
         {
             role: 'system',
-            content: `Eres un generador de planes de entrenamiento. Tu única tarea es responder con un objeto JSON válido, siguiendo estrictamente la estructura indicada por el usuario.
-NO debes incluir saludos, explicaciones, texto antes o después del JSON.
-Tu respuesta debe ser exclusivamente el JSON. Cualquier otra cosa está terminantemente prohibida.`,
+            content:
+                'Eres un generador de planes de entrenamiento. Tu única función es devolver un objeto JSON válido. No puedes incluir saludos, explicaciones, comentarios ni texto adicional. Bajo ninguna circunstancia debes responder con texto fuera del objeto JSON. Si no puedes cumplir esto, responde con un objeto JSON vacío: {}.',
         },
         {
             role: 'user',
             content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(', ')}.
 El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
 
-Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta (sin ningún texto adicional antes o después):
+Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
 
 {
   "generatedPlan": [
@@ -44,17 +43,14 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
   ]
 }
 
-REGLAS ESTRICTAS:
-
-- Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramiento.
-- Calentamiento: 2 a 3 ejercicios.
-- Principal: 4 a 6 ejercicios intensos relacionados a los objetivos.
+Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramiento.
+- Calentamiento: 2-3 ejercicios.
+- Principal: 4-6 ejercicios.
 - Estiramiento: mínimo 2 ejercicios.
-- Los ejercicios deben ser variados, no repetirse en días consecutivos y adaptados a los objetivos indicados.
 
-🚫 PROHIBIDO incluir cualquier otra cosa fuera del JSON. No uses etiquetas, saludos ni explicaciones.
+Los ejercicios deben ser específicos y distintos entre días consecutivos.
 
-Devuelve SOLO el objeto JSON. Nada más.`,
+NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
         },
     ];
 
