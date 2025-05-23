@@ -105,23 +105,10 @@ export default function MainSection() {
             );
 
             const data = await response.json();
-            const content = data?.content;
-
-            if (!content || typeof content !== 'string') {
-                throw new Error(
-                    'La respuesta de la IA está vacía o no es válida.',
-                );
-            }
-
-            const json = JSON.parse(content);
-            return json;
+            return JSON.parse(data.content);
         } catch (err) {
-            console.error('❌ Error al generar plan:', err);
-            setApiError(
-                err instanceof Error
-                    ? err.message
-                    : 'Error desconocido al generar el plan.',
-            );
+            console.error(err);
+            setApiError('Error al generar el plan de entrenamiento.');
         }
     };
 
@@ -135,21 +122,18 @@ export default function MainSection() {
                     selectedGoals,
                     selectedDays,
                 );
-
-                if (workoutData && workoutData.generatedPlan) {
-                    setWorkoutPlan({
-                        userName,
-                        goals: selectedGoals,
-                        workoutDays: selectedDays,
-                        generatedPlan: workoutData.generatedPlan,
-                    });
-                } else {
-                    setApiError(
-                        'No se pudo generar un plan válido. Intenta de nuevo.',
-                    );
-                }
+                setWorkoutPlan({
+                    userName,
+                    goals: selectedGoals,
+                    workoutDays: selectedDays,
+                    generatedPlan: workoutData.generatedPlan,
+                });
             } catch (error) {
-                setApiError('Fallo inesperado al generar el plan.');
+                setApiError(
+                    error instanceof Error
+                        ? error.message
+                        : 'Error desconocido',
+                );
             } finally {
                 setIsLoading(false);
             }
@@ -273,8 +257,9 @@ export default function MainSection() {
                                                                         {
                                                                             ex.equipment
                                                                         }{' '}
+                                                                        |{' '}
                                                                         {ex.rest &&
-                                                                            `| Descanso: ${ex.rest}`}
+                                                                            `Descanso: ${ex.rest}`}
                                                                     </span>
                                                                     <br />
                                                                     <em className="text-blue-500">

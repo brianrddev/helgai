@@ -5,7 +5,7 @@ export async function handler(event) {
         {
             role: 'system',
             content:
-                'Eres un generador de planes de entrenamiento. SOLO debes responder con un objeto JSON válido. No puedes incluir saludos, explicaciones, comentarios, etiquetas markdown, ni ningún texto adicional. Bajo ninguna circunstancia debes responder con texto fuera del objeto JSON. Si no puedes cumplir esto, responde con un objeto JSON vacío: {}.',
+                'Eres un generador de planes de entrenamiento. SOLO debes responder con un objeto JSON válido. No debes incluir saludos, explicaciones, comentarios, markdown ni ningún texto adicional. Bajo ninguna circunstancia debes responder con texto fuera del objeto JSON. Si no puedes cumplir esto, responde con un objeto JSON vacío: {}.',
         },
         {
             role: 'user',
@@ -62,7 +62,7 @@ NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown 
                     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
                 },
                 body: JSON.stringify({
-                    model: 'gpt-3.5-turbo',
+                    model: 'gpt-3.5-turbo-16k-1106',
                     messages,
                     temperature: 0.7,
                     max_tokens: 8000,
