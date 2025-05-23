@@ -62,35 +62,44 @@ NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown 
                     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
                 },
                 body: JSON.stringify({
-                    model: 'gpt-3.5-turbo-16k-1106',
+                    model: 'gpt-3.5-turbo', // Modelo actualizado y válido
                     messages,
                     temperature: 0.7,
-                    max_tokens: 8000,
+                    max_tokens: 4000, // Reducido para el modelo estándar
                 }),
             },
         );
 
-        const raw = await response.text();
-
         if (!response.ok) {
-            console.error('OpenAI API error:', response.status, raw);
+            const errorText = await response.text();
+            console.error('OpenAI API error:', response.status, errorText);
             return {
-                statusCode: 502,
+                statusCode: response.status,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                },
                 body: JSON.stringify({
-                    error: 'Fallo al comunicarse con OpenAI',
+                    error: 'Error en la API de OpenAI',
                     status: response.status,
-                    raw,
+                    details: errorText,
                 }),
             };
         }
 
-        const data = JSON.parse(raw);
+        const data = await response.json();
         const content = data.choices?.[0]?.message?.content;
 
         if (!content || typeof content !== 'string') {
             console.error('Respuesta sin contenido o malformada:', data);
             return {
                 statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                },
                 body: JSON.stringify({
                     error: 'OpenAI no devolvió contenido válido',
                     rawResponse: data,
@@ -98,14 +107,50 @@ NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown 
             };
         }
 
+        // Limpiar la respuesta de posibles caracteres extra
+        const cleanContent = content
+            .trim()
+            .replace(/^```json\n?/, '')
+            .replace(/\n?```$/, '');
+
+        // Validar que sea JSON válido antes de enviarlo
+        try {
+            JSON.parse(cleanContent);
+        } catch (parseError) {
+            console.error('Error parsing JSON response:', parseError);
+            console.error('Raw content:', content);
+            return {
+                statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                },
+                body: JSON.stringify({
+                    error: 'La respuesta de OpenAI no es JSON válido',
+                    rawContent: content,
+                }),
+            };
+        }
+
         return {
             statusCode: 200,
-            body: JSON.stringify({ content }),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            },
+            body: JSON.stringify({ content: cleanContent }),
         };
     } catch (err) {
         console.error('Excepción inesperada:', err);
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            },
             body: JSON.stringify({
                 error: 'Error inesperado al generar el plan',
                 details: err.message,
