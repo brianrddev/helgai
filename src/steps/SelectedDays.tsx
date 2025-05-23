@@ -16,16 +16,16 @@ export default function SelectedDays({
     return (
         <form onSubmit={handleFinalSubmit} className="mb-6">
             <div>
-                <div className="mb-4 flex flex-wrap gap-2 rounded-md bg-transparent mask-b-from-56 p-4 md:flex-nowrap md:mask-b-from-12">
+                <div className="mb-4 flex flex-wrap gap-2 rounded-md bg-transparent p-4 md:flex-nowrap">
                     {availableDays.map((day) => (
                         <button
                             key={day}
                             type="button"
                             onClick={() => handleDayToggle(day)}
-                            className={`cursor-pointer rounded-md px-4 py-2 transition-all duration-300 ease-in-out select-none hover:bg-gray-300 ${
+                            className={`cursor-pointer rounded-md px-4 py-2 transition-all duration-300 ease-in-out select-none hover:bg-blue-300 ${
                                 selectedDays.includes(day)
-                                    ? 'bg-gray-200'
-                                    : 'border-gray-500 bg-transparent'
+                                    ? 'bg-blue-500 text-blue-50'
+                                    : 'border-gray-500'
                             }`}
                         >
                             {day}

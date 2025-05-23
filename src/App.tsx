@@ -10,7 +10,7 @@ const App: React.FC = () => {
         <>
             <div className="flex min-h-screen flex-col bg-gray-100 text-gray-950">
                 <Header />
-                <div className="z-10 flex flex-grow flex-col items-center justify-center px-4 py-12">
+                <div className="z-10 flex flex-grow flex-col items-center justify-center px-4 py-6">
                     <Badge />
                     <HeroText />
                     <MainSection />

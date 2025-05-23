@@ -13,23 +13,37 @@ export async function handler(event) {
 El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
 
 Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
+
 {
   "generatedPlan": [
     {
       "day": "Nombre del día",
-      "exercises": [
-        {
-          "name": "Nombre del ejercicio",
-          "sets": número de series,
-          "repetitions": "rango de repeticiones (ej: '8-12')",
-          "rest": "tiempo de descanso (ej: '60 seg')"
-        }
-      ]
+      "workout": {
+        "focus": "parte del cuerpo o tipo de entrenamiento del día",
+        "duration": "duración estimada (ej: '45-60 min')",
+        "phases": [
+          {
+            "phaseName": "Calentamiento | Principal | Estiramiento",
+            "exercises": [
+              {
+                "name": "Nombre del ejercicio",
+                "sets": número de series (solo si aplica),
+                "repetitions": "repeticiones (solo si aplica)",
+                "duration": "tiempo (solo si aplica)",
+                "rest": "descanso entre series (si aplica)",
+                "type": "fuerza | resistencia | movilidad",
+                "equipment": "ninguno | mancuernas | barra | máquina | banda",
+                "tips": "consejo útil"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
 
-Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos. No incluyas nada más que el JSON.`,
+Cada día debe tener al menos 3 fases: Calentamiento, Principal y Estiramiento. No incluyas nada más que el JSON.`,
         },
     ];
 
@@ -46,7 +60,7 @@ Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos
                     model: 'gpt-3.5-turbo',
                     messages,
                     temperature: 0.7,
-                    max_tokens: 2000,
+                    max_tokens: 3000,
                 }),
             },
         );
@@ -56,7 +70,7 @@ Cada día debe tener entre 3-5 ejercicios específicos adaptados a los objetivos
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ content }), // 👈 Solo devolvemos el string generado
+            body: JSON.stringify({ content }),
         };
     } catch (err) {
         return {

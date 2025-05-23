@@ -3,16 +3,31 @@ import UserName from './steps/UserName';
 import UserGoals from './steps/UserGoals';
 import SelectedDays from './steps/SelectedDays';
 
-interface WorkoutDay {
-    day: string;
+interface Exercise {
+    name: string;
+    sets?: number;
+    repetitions?: string;
+    duration?: string;
+    rest?: string;
+    type: string;
+    equipment: string;
+    tips: string;
+}
+
+interface Phase {
+    phaseName: string;
     exercises: Exercise[];
 }
 
-interface Exercise {
-    name: string;
-    sets: number;
-    repetitions: string;
-    rest: string;
+interface Workout {
+    focus: string;
+    duration: string;
+    phases: Phase[];
+}
+
+interface WorkoutDay {
+    day: string;
+    workout: Workout;
 }
 
 interface WorkoutPlan {
@@ -23,7 +38,6 @@ interface WorkoutPlan {
 }
 
 export default function MainSection() {
-    // Estados para el formulario secuencial
     const [userName, setUserName] = useState('');
     const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
@@ -32,7 +46,6 @@ export default function MainSection() {
     const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
     const [apiError, setApiError] = useState<string | null>(null);
 
-    // Opciones disponibles
     const availableGoals = [
         'Pérdida de peso',
         'Ganancia muscular',
@@ -51,35 +64,28 @@ export default function MainSection() {
         'Domingo',
     ];
 
-    // Manejadores de eventos
     const handleNameSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (userName.trim()) {
-            setStep(2);
-        }
+        if (userName.trim()) setStep(2);
     };
 
     const handleGoalToggle = (goal: string) => {
-        if (selectedGoals.includes(goal)) {
-            setSelectedGoals(selectedGoals.filter((g) => g !== goal));
-        } else {
-            setSelectedGoals([...selectedGoals, goal]);
-        }
+        setSelectedGoals((prev) =>
+            prev.includes(goal)
+                ? prev.filter((g) => g !== goal)
+                : [...prev, goal],
+        );
     };
 
     const handleGoalsSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (selectedGoals.length > 0) {
-            setStep(3);
-        }
+        if (selectedGoals.length > 0) setStep(3);
     };
 
     const handleDayToggle = (day: string) => {
-        if (selectedDays.includes(day)) {
-            setSelectedDays(selectedDays.filter((d) => d !== day));
-        } else {
-            setSelectedDays([...selectedDays, day]);
-        }
+        setSelectedDays((prev) =>
+            prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+        );
     };
 
     const generateWorkoutPlanWithOpenAI = async (
@@ -88,27 +94,18 @@ export default function MainSection() {
         days: string[],
     ) => {
         setApiError(null);
-
         try {
             const response = await fetch(
                 '/.netlify/functions/generateWorkout',
                 {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userName, goals, days }),
                 },
             );
 
             const data = await response.json();
-
-            // ✅ Ahora el backend retorna { content: "..." }
-            const content = data.content;
-            const json = JSON.parse(content); // el plan generado
-
-            console.log(json);
-            return json;
+            return JSON.parse(data.content);
         } catch (err) {
             console.error(err);
             setApiError('Error al generar el plan de entrenamiento.');
@@ -119,27 +116,23 @@ export default function MainSection() {
         e.preventDefault();
         if (selectedDays.length > 0) {
             setIsLoading(true);
-
             try {
                 const workoutData = await generateWorkoutPlanWithOpenAI(
                     userName,
                     selectedGoals,
                     selectedDays,
                 );
-
-                const generatedWorkoutPlan: WorkoutPlan = {
+                setWorkoutPlan({
                     userName,
                     goals: selectedGoals,
                     workoutDays: selectedDays,
                     generatedPlan: workoutData.generatedPlan,
-                };
-
-                setWorkoutPlan(generatedWorkoutPlan);
+                });
             } catch (error) {
                 setApiError(
                     error instanceof Error
                         ? error.message
-                        : 'Ocurrió un error al generar el plan',
+                        : 'Error desconocido',
                 );
             } finally {
                 setIsLoading(false);
@@ -158,11 +151,8 @@ export default function MainSection() {
 
     return (
         <div className="h-fit min-h-56 w-fit max-w-6xl rounded-lg">
-            {/* App Interface */}
             <div className="flex h-full flex-col md:flex-row">
-                {/* Main Content Area */}
                 <div className="p-6">
-                    {/* Sequential Input Form */}
                     {!workoutPlan ? (
                         <div className="mx-auto flex w-60 items-center justify-center md:w-full">
                             {step === 1 && (
@@ -172,7 +162,6 @@ export default function MainSection() {
                                     setUserName={setUserName}
                                 />
                             )}
-
                             {step === 2 && (
                                 <UserGoals
                                     selectedGoals={selectedGoals}
@@ -181,31 +170,23 @@ export default function MainSection() {
                                     handleGoalsSubmit={handleGoalsSubmit}
                                 />
                             )}
-
                             {step === 3 && (
                                 <SelectedDays
-                                    handleFinalSubmit={handleFinalSubmit}
+                                    selectedDays={selectedDays}
                                     availableDays={availableDays}
                                     handleDayToggle={handleDayToggle}
-                                    selectedDays={selectedDays}
+                                    handleFinalSubmit={handleFinalSubmit}
                                     isLoading={isLoading}
                                 />
                             )}
-
                             {apiError && (
                                 <div className="mt-4 w-full rounded-md bg-red-50 p-4 text-red-600">
                                     <p>Error: {apiError}</p>
-                                    <p className="mt-2 text-sm">
-                                        Asegúrate de haber configurado
-                                        correctamente la API key de OpenAI en
-                                        tus variables de entorno.
-                                    </p>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        // Display workout plan
-                        <div className="mx-auto rounded-md bg-gray-50 shadow-2xl shadow-blue-700/80 md:w-full md:p-8 lg:min-w-3xl">
+                        <div className="mx-auto rounded-md bg-gray-50 shadow-2xl shadow-blue-700/80 md:w-full md:p-8">
                             <div className="mb-6 border-b border-gray-300 p-6 pb-0">
                                 <div className="mb-6 flex justify-between">
                                     <div className="flex items-center">
@@ -221,7 +202,7 @@ export default function MainSection() {
                                     </div>
                                     <button
                                         onClick={resetForm}
-                                        className="max-h-10 cursor-pointer rounded bg-gray-300 px-4 py-2 transition-all duration-200 ease-in-out hover:bg-blue-600 hover:text-gray-50"
+                                        className="rounded bg-gray-300 px-4 py-2 hover:bg-blue-600 hover:text-white"
                                     >
                                         Nuevo plan
                                     </button>
@@ -231,69 +212,69 @@ export default function MainSection() {
                             <div className="space-y-6">
                                 {workoutPlan.generatedPlan.map((day, index) => (
                                     <div key={index} className="rounded-lg p-6">
-                                        <div className="mb-4 flex items-center">
-                                            <div className="mr-3 rounded-lg bg-blue-600 p-2 text-blue-50">
-                                                <svg
-                                                    className="h-5 w-5"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
+                                        <h3 className="font-satoshi-bd text-lg text-blue-700">
+                                            {day.day}
+                                        </h3>
+                                        <p className="mb-2 text-sm text-gray-500">
+                                            Enfoque: {day.workout.focus} |
+                                            Duración: {day.workout.duration}
+                                        </p>
+                                        {day.workout.phases.map(
+                                            (phase, pIdx) => (
+                                                <div
+                                                    key={pIdx}
+                                                    className="mb-4"
                                                 >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </div>
-                                            <h3 className="font-satoshi-bd text-lg">
-                                                {day.day}
-                                            </h3>
-                                        </div>
-
-                                        <div className="ml-10 space-y-3">
-                                            {day.exercises.map(
-                                                (exercise, exIndex) => (
-                                                    <div
-                                                        key={exIndex}
-                                                        className="border-l-2 border-blue-600/50 py-2 pl-4"
-                                                    >
-                                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                                            <span className="font-satoshi text-lg">
-                                                                {exercise.name}
-                                                            </span>
-                                                            <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 sm:mt-0">
-                                                                <span>
-                                                                    {
-                                                                        exercise.sets
-                                                                    }{' '}
-                                                                    series
-                                                                </span>
-                                                                <span>
-                                                                    {
-                                                                        exercise.repetitions
-                                                                    }{' '}
-                                                                    reps
-                                                                </span>
-                                                                <span>
-                                                                    {
-                                                                        exercise.rest
-                                                                    }{' '}
-                                                                    descanso
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ),
-                                            )}
-
-                                            <div className="mt-4 pl-4 text-sm text-gray-400">
-                                                <span>
-                                                    Recuerda calentar antes y
-                                                    estirar después de cada
-                                                    sesión
-                                                </span>
-                                            </div>
-                                        </div>
+                                                    <h4 className="text-md mt-3 font-semibold text-blue-600">
+                                                        {phase.phaseName}
+                                                    </h4>
+                                                    <ul className="ml-6 list-disc text-sm">
+                                                        {phase.exercises.map(
+                                                            (ex, eIdx) => (
+                                                                <li
+                                                                    key={eIdx}
+                                                                    className="mb-2"
+                                                                >
+                                                                    <strong>
+                                                                        {
+                                                                            ex.name
+                                                                        }
+                                                                    </strong>{' '}
+                                                                    {ex.sets &&
+                                                                        `- ${ex.sets}x`}{' '}
+                                                                    {ex.repetitions &&
+                                                                        `${ex.repetitions} reps`}{' '}
+                                                                    {ex.duration &&
+                                                                        `- ${ex.duration}`}
+                                                                    <br />
+                                                                    <span className="text-gray-500">
+                                                                        Tipo:{' '}
+                                                                        {
+                                                                            ex.type
+                                                                        }{' '}
+                                                                        |
+                                                                        Equipo:{' '}
+                                                                        {
+                                                                            ex.equipment
+                                                                        }{' '}
+                                                                        |{' '}
+                                                                        {ex.rest &&
+                                                                            `Descanso: ${ex.rest}`}
+                                                                    </span>
+                                                                    <br />
+                                                                    <em className="text-blue-500">
+                                                                        Consejo:{' '}
+                                                                        {
+                                                                            ex.tips
+                                                                        }
+                                                                    </em>
+                                                                </li>
+                                                            ),
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            ),
+                                        )}
                                     </div>
                                 ))}
                             </div>

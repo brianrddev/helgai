@@ -14,15 +14,15 @@ export default function UserGoals({
     return (
         <form onSubmit={handleGoalsSubmit} className="mb-8">
             <div className="flex flex-col">
-                <div className="mb-4 flex flex-col gap-2 rounded-md bg-transparent mask-b-from-56 p-4 md:flex-row md:flex-nowrap md:mask-b-from-12">
+                <div className="mb-4 flex flex-col gap-2 rounded-md bg-transparent p-4 md:flex-row md:flex-nowrap">
                     {availableGoals.map((goal) => (
                         <button
                             key={goal}
                             type="button"
                             onClick={() => handleGoalToggle(goal)}
-                            className={`cursor-pointer rounded-md px-4 py-2 transition-all ease-in-out select-none hover:bg-gray-300 md:duration-200 ${
+                            className={`cursor-pointer rounded-md px-4 py-2 transition-all duration-300 ease-in-out select-none hover:bg-blue-300 ${
                                 selectedGoals.includes(goal)
-                                    ? 'bg-gray-200'
+                                    ? 'bg-blue-500 text-blue-50'
                                     : 'border-gray-500 bg-transparent'
                             }`}
                         >
