@@ -4,15 +4,16 @@ export async function handler(event) {
     const messages = [
         {
             role: 'system',
-            content:
-                'Eres un entrenador personal experto que crea planes de entrenamiento personalizados. Responde siempre con un objeto JSON válido que tenga el formato exacto que se especifica, sin texto adicional.',
+            content: `Eres un generador de planes de entrenamiento. Tu única tarea es responder con un objeto JSON válido, siguiendo estrictamente la estructura indicada por el usuario.
+NO debes incluir saludos, explicaciones, texto antes o después del JSON.
+Tu respuesta debe ser exclusivamente el JSON. Cualquier otra cosa está terminantemente prohibida.`,
         },
         {
             role: 'user',
             content: `Crea un plan de entrenamiento para ${userName} con los siguientes objetivos: ${goals.join(', ')}.
 El plan debe incluir entrenamientos para estos días: ${days.join(', ')}.
 
-Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta (sin ningún texto adicional antes o después):
 
 {
   "generatedPlan": [
@@ -43,15 +44,17 @@ Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
   ]
 }
 
-Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramiento.
+REGLAS ESTRICTAS:
 
-- La fase de Calentamiento debe contener de 2 a 3 ejercicios.
-- La fase Principal debe contener entre 4 y 6 ejercicios intensos enfocados en los objetivos indicados.
-- La fase de Estiramiento debe incluir al menos 2 ejercicios de movilidad y relajación.
+- Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramiento.
+- Calentamiento: 2 a 3 ejercicios.
+- Principal: 4 a 6 ejercicios intensos relacionados a los objetivos.
+- Estiramiento: mínimo 2 ejercicios.
+- Los ejercicios deben ser variados, no repetirse en días consecutivos y adaptados a los objetivos indicados.
 
-Los ejercicios deben ser variados, específicos para los objetivos, y no repetirse en días consecutivos.
+🚫 PROHIBIDO incluir cualquier otra cosa fuera del JSON. No uses etiquetas, saludos ni explicaciones.
 
-No incluyas nada más que el JSON.`,
+Devuelve SOLO el objeto JSON. Nada más.`,
         },
     ];
 
