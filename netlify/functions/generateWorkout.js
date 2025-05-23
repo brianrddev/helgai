@@ -54,8 +54,6 @@ NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
         },
     ];
 
-    console.log(messages);
-
     try {
         const response = await fetch(
             'https://api.openai.com/v1/chat/completions',
@@ -74,18 +72,43 @@ NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
             },
         );
 
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('OpenAI API error:', response.status, errorText);
+            return {
+                statusCode: 502,
+                body: JSON.stringify({
+                    error: 'Fallo al comunicarse con OpenAI',
+                    status: response.status,
+                    details: errorText,
+                }),
+            };
+        }
+
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content;
+
+        if (!content) {
+            console.error('Respuesta sin contenido:', data);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: 'OpenAI no devolvió contenido',
+                    rawResponse: data,
+                }),
+            };
+        }
 
         return {
             statusCode: 200,
             body: JSON.stringify({ content }),
         };
     } catch (err) {
+        console.error('Excepción inesperada:', err);
         return {
             statusCode: 500,
             body: JSON.stringify({
-                error: 'Error al generar el plan',
+                error: 'Error inesperado al generar el plan',
                 details: err.message,
             }),
         };
