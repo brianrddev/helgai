@@ -5,7 +5,7 @@ export async function handler(event) {
         {
             role: 'system',
             content:
-                'Eres un generador de planes de entrenamiento. Tu única función es devolver un objeto JSON válido. No puedes incluir saludos, explicaciones, comentarios ni texto adicional. Bajo ninguna circunstancia debes responder con texto fuera del objeto JSON. Si no puedes cumplir esto, responde con un objeto JSON vacío: {}.',
+                'Eres un generador de planes de entrenamiento. SOLO debes responder con un objeto JSON válido. No puedes incluir saludos, explicaciones, comentarios, etiquetas markdown, ni ningún texto adicional. Bajo ninguna circunstancia debes responder con texto fuera del objeto JSON. Si no puedes cumplir esto, responde con un objeto JSON vacío: {}.',
         },
         {
             role: 'user',
@@ -48,13 +48,9 @@ Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramient
 - Principal: 4-6 ejercicios.
 - Estiramiento: mínimo 2 ejercicios.
 
-Los ejercicios deben ser específicos y distintos entre días consecutivos.
-
-NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
+NO INCLUYAS "Aquí tienes", ni comillas alrededor del JSON, ni formato markdown (\`\`\`). Devuelve el JSON limpio. Solo eso.`,
         },
     ];
-
-    console.log('messages', messages);
 
     try {
         const response = await fetch(
@@ -66,36 +62,37 @@ NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
                     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
                 },
                 body: JSON.stringify({
-                    model: 'gpt-3.5-turbo',
+                    model: 'gpt-3.5-turbo-16k',
                     messages,
                     temperature: 0.7,
-                    max_tokens: 3000,
+                    max_tokens: 8000,
                 }),
             },
         );
 
+        const raw = await response.text();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('OpenAI API error:', response.status, errorText);
+            console.error('OpenAI API error:', response.status, raw);
             return {
                 statusCode: 502,
                 body: JSON.stringify({
                     error: 'Fallo al comunicarse con OpenAI',
                     status: response.status,
-                    details: errorText,
+                    raw,
                 }),
             };
         }
 
-        const data = await response.json();
+        const data = JSON.parse(raw);
         const content = data.choices?.[0]?.message?.content;
 
-        if (!content) {
-            console.error('Respuesta sin contenido:', data);
+        if (!content || typeof content !== 'string') {
+            console.error('Respuesta sin contenido o malformada:', data);
             return {
                 statusCode: 500,
                 body: JSON.stringify({
-                    error: 'OpenAI no devolvió contenido',
+                    error: 'OpenAI no devolvió contenido válido',
                     rawResponse: data,
                 }),
             };
