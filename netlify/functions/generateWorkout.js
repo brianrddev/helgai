@@ -43,7 +43,15 @@ Devuelve SOLO un objeto JSON con la siguiente estructura exacta:
   ]
 }
 
-Cada día debe tener al menos 3 fases: Calentamiento, Principal y Estiramiento. No incluyas nada más que el JSON.`,
+Cada día debe tener exactamente 3 fases: Calentamiento, Principal y Estiramiento.
+
+- La fase de Calentamiento debe contener de 2 a 3 ejercicios.
+- La fase Principal debe contener entre 4 y 6 ejercicios intensos enfocados en los objetivos indicados.
+- La fase de Estiramiento debe incluir al menos 2 ejercicios de movilidad y relajación.
+
+Los ejercicios deben ser variados, específicos para los objetivos, y no repetirse en días consecutivos.
+
+No incluyas nada más que el JSON.`,
         },
     ];
 

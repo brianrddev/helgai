@@ -150,7 +150,7 @@ export default function MainSection() {
     };
 
     return (
-        <div className="h-fit min-h-56 w-fit max-w-6xl rounded-lg">
+        <div className="max-w-8xl h-fit min-h-56 w-fit rounded-lg">
             <div className="flex h-full flex-col md:flex-row">
                 <div className="p-6">
                     {!workoutPlan ? (
@@ -202,14 +202,14 @@ export default function MainSection() {
                                     </div>
                                     <button
                                         onClick={resetForm}
-                                        className="rounded bg-gray-300 px-4 py-2 hover:bg-blue-600 hover:text-white"
+                                        className="h-16 w-32 rounded bg-gray-300 hover:bg-blue-600 hover:text-white"
                                     >
                                         Nuevo plan
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="min-w-[600px] space-y-6">
                                 {workoutPlan.generatedPlan.map((day, index) => (
                                     <div key={index} className="rounded-lg p-6">
                                         <h3 className="font-satoshi-bd text-lg text-blue-700">
