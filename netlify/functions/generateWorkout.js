@@ -54,6 +54,8 @@ NO INCLUYAS texto fuera del JSON. Solo devuelve el JSON. Nada más.`,
         },
     ];
 
+    console.log(messages);
+
     try {
         const response = await fetch(
             'https://api.openai.com/v1/chat/completions',
